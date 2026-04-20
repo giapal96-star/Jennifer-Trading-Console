@@ -1,0 +1,28 @@
+name: Jennifer Trading System
+
+on:
+  schedule:
+    - cron: '0,15,30,45 9-22 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python "Sarada_Trading_System.py" --single-run
+        env:
+          GITHUB_ACTIONS: "true"
+      - run: |
+          git config user.email "bot@jennifer.com"
+          git config user.name "Jennifer Bot"
+          git add docs/ -f
+          git diff --staged --quiet || git commit -m "Update dashboard"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
